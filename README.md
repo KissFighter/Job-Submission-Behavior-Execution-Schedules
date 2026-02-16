@@ -221,3 +221,41 @@ analysis_ready\merge_whole_cluster_usage.bat ^
   --output "D:\path\to\output\whole_cluster_usage_merged_raw.txt.gz" ^
   --strict-header
 ```
+
+### stat427 环境 + Notebook 运行说明（追加）
+下面这段是给团队成员统一复现实验用，直接复制执行即可。
+
+1. 进入仓库根目录
+```bash
+cd /path/to/Job-Submission-Behavior-Execution-Schedules
+```
+
+2. 创建并激活 `stat427` 环境（优先 conda）
+```bash
+conda env create -f environment.yml
+conda activate stat427
+```
+
+3. 注册 Jupyter kernel
+```bash
+python -m ipykernel install --user --name stat427 --display-name "Python (stat427)"
+```
+
+4. 启动 Jupyter Lab
+```bash
+jupyter lab
+```
+
+5. 打开并运行 notebook
+- 打开：`notebooks/01_build_master_2025.ipynb`
+- 在 VSCode 或 Jupyter 中选择 kernel：`Python (stat427)`
+- 执行：`Restart Kernel + Run All`
+
+6. 结果输出目录
+- `outputs/master_2025_raw_valid.csv.gz`
+- `outputs/master_2025_joblevel_submission.csv.gz`
+- `outputs/master_2025_joblevel_terminal.csv.gz`
+
+注意：
+- 不要在 `base` 环境安装依赖。
+- 统一通过 `environment.yml`（或备选 `requirements.txt`）管理依赖。
