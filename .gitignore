@@ -1,0 +1,24 @@
+# Private/raw dataset directories
+iccp-cluster-usage-analysis-selected/
+whole-cluster-usage/
+statclass/
+2025_seff/
+data/
+datasets/
+raw/
+
+# Private/raw dataset files
+slurm_all_jobs_*.csv
+*25.txt
+seff_*.txt
+*.zip
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.dta
+*.sav
+*.h5
+*.hdf5
+*.sqlite
+*.db
