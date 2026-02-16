@@ -76,6 +76,39 @@ The analysis workflow below follows the plan previously drafted for this project
 ### Current Repository Files
 - `dataset_suitability_report.md`: dataset suitability and selection report
 - `analysis_ready/peek_merged_data.py`: lightweight script to preview merged data headers and sample rows
+- `analysis_ready/merge_whole_cluster_usage.py`: streaming merge script for monthly txt files
+- `analysis_ready/merge_whole_cluster_usage.sh`: Mac/Linux launcher
+- `analysis_ready/merge_whole_cluster_usage.bat`: Windows launcher
+
+### How to Merge Monthly TXT Files (Reusable for Teammates)
+Recommended output format is compressed `txt.gz` to save space.
+
+Mac/Linux:
+```bash
+python3 analysis_ready/merge_whole_cluster_usage.py \
+  --input-dir /path/to/whole-cluster-usage \
+  --glob "*25.txt" \
+  --output /path/to/output/whole_cluster_usage_merged_raw.txt.gz \
+  --strict-header
+```
+
+or:
+```bash
+./analysis_ready/merge_whole_cluster_usage.sh \
+  --input-dir /path/to/whole-cluster-usage \
+  --glob "*25.txt" \
+  --output /path/to/output/whole_cluster_usage_merged_raw.txt.gz \
+  --strict-header
+```
+
+Windows (CMD):
+```bat
+analysis_ready\merge_whole_cluster_usage.bat ^
+  --input-dir "D:\path\to\whole-cluster-usage" ^
+  --glob "*25.txt" ^
+  --output "D:\path\to\output\whole_cluster_usage_merged_raw.txt.gz" ^
+  --strict-header
+```
 
 ---
 
@@ -155,4 +188,36 @@ The analysis workflow below follows the plan previously drafted for this project
 ### 当前仓库文件
 - `dataset_suitability_report.md`：数据集适配性与选型报告
 - `analysis_ready/peek_merged_data.py`：轻量预览脚本（查看表头与前几行样本）
+- `analysis_ready/merge_whole_cluster_usage.py`：按月 txt 流式合并脚本
+- `analysis_ready/merge_whole_cluster_usage.sh`：Mac/Linux 启动脚本
+- `analysis_ready/merge_whole_cluster_usage.bat`：Windows 启动脚本
 
+### 如何合并月度 TXT（可直接给同学复用）
+建议输出为压缩的 `txt.gz`，节省空间。
+
+Mac/Linux：
+```bash
+python3 analysis_ready/merge_whole_cluster_usage.py \
+  --input-dir /path/to/whole-cluster-usage \
+  --glob "*25.txt" \
+  --output /path/to/output/whole_cluster_usage_merged_raw.txt.gz \
+  --strict-header
+```
+
+或者：
+```bash
+./analysis_ready/merge_whole_cluster_usage.sh \
+  --input-dir /path/to/whole-cluster-usage \
+  --glob "*25.txt" \
+  --output /path/to/output/whole_cluster_usage_merged_raw.txt.gz \
+  --strict-header
+```
+
+Windows（CMD）：
+```bat
+analysis_ready\merge_whole_cluster_usage.bat ^
+  --input-dir "D:\path\to\whole-cluster-usage" ^
+  --glob "*25.txt" ^
+  --output "D:\path\to\output\whole_cluster_usage_merged_raw.txt.gz" ^
+  --strict-header
+```
