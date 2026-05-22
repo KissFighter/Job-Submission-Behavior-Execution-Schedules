@@ -1,111 +1,101 @@
 # Job Submission Behavior & Execution Schedules
 
-## English
+This repository presents an HPC / SLURM workload analysis project focused on how users submit jobs, how long those jobs wait in queue, and how resource demand relates to scheduling outcomes. It combines a large-scale preprocessing pipeline for raw SLURM accounting logs, local generation of derived job-level datasets, and notebooks for exploratory and early predictive analysis of submission timing, wait time, runtime, CPU/GPU workloads, and queue behavior.
 
-### Project Overview
-This repository documents and supports the analysis of job submission behavior and execution schedules on a campus HPC cluster.
+## Open First
 
-The goal is to understand:
-- when users submit jobs,
-- how long jobs wait before starting,
-- how workloads differ by requested resources,
-- and how submission timing is associated with workload type.
+- Open `notebooks/02_job_submission_behavior_analysis.ipynb` first for the main analytical story.
+- Open `notebooks/01_build_master_2025.ipynb` if you want to inspect the preprocessing and feature-engineering pipeline that generates the local derived tables.
 
-### Data Introduction
-The analysis context includes the following local datasets:
+## Project Overview
 
-1. Primary dataset (recommended for final analysis):  
-`whole-cluster-usage/*.txt`
-- Monthly files (`jan25.txt` to `dec25.txt`)
-- Pipe-delimited job-accounting records with rich Slurm fields (120 columns)
-- Best source for submission-time and scheduling analysis
+The project treats HPC usage data as an end-to-end analysis workflow:
 
-2. Duplicate monthly dataset (do not combine with primary):  
-`statclass/*.txt`
-- Same monthly structure and content as `whole-cluster-usage/*.txt`
-- Should not be merged together with the primary set, to avoid double counting
+- merge large monthly SLURM accounting logs,
+- validate schema and clean missing or inconsistent fields,
+- engineer job-level scheduling features such as wait time and runtime,
+- build local derived tables for analysis,
+- and study how submission timing, requested resources, and workload type relate to scheduling outcomes.
 
-3. Preliminary dataset (reference only):  
-`slurm_all_jobs_jan15_oct2_2025.zip` (contains CSV)
-- Useful for early-stage checks
-- Not complete for full-year 2025 reporting
+The emphasis is on technically grounded workflow design rather than polished final scientific claims. The repository is meant to show a reproducible analysis pipeline and a clear analytical direction.
 
-4. Optional efficiency supplement:  
-`whole-cluster-usage/2025_seff/*.txt`
-- Contains `CPU Efficiency` and `Memory Efficiency` style outputs
-- Semi-structured and uneven coverage by month
-- Use as a supplement, not as the main population baseline
+## Research Questions
 
-### Data Privacy and Repository Scope
-- Raw/private datasets are **not** stored in this GitHub repository.
-- This repository is intended for:
-  - documentation,
-  - analysis scripts,
-  - reproducible workflow notes.
-- Large private data files should remain in local/private storage only.
+- When do users submit jobs across weekdays and hours of day?
+- How are queue wait times distributed, and which jobs wait the longest?
+- How do requested CPUs, memory, nodes, and GPUs relate to wait time and execution behavior?
+- How do GPU workloads differ from CPU-only workloads?
+- Can workload features and submission timing help explain queue behavior?
 
-### Proposed Analysis Workflow
-The analysis workflow below follows the plan previously drafted for this project.
+## Repository Structure
 
-1. **Data validation and consistency checks**
-- Verify consistency between `AllocCPUS` and CPU-related information in `AllocTRES`.
-- Check whether `Elapsed` is consistent with the `Start`/`End` timestamp difference for completed jobs.
-- Parse timestamp fields carefully; treat placeholders like `None` and `Unknown` as missing values.
-
-2. **Exploratory analysis of timing and resource distributions**
-- Compute and inspect wait time (`Start - Submit`).
-- Examine submission patterns by weekday and hour-of-day.
-- Analyze runtime distribution (`End - Start`) for completed jobs.
-- Inspect distributions of `ReqCPUS`, `ReqMem`, and `ReqNodes`.
-
-3. **Define workload categories with interpretable rules**
-- Use transparent threshold-based tiers (for example: small / medium / large).
-- Prefer rule-based grouping over clustering for resource-request variables that are highly discrete.
-- Preserve interpretability for stakeholders and downstream reporting.
-
-4. **Model association between submission timing and workload type**
-- Fit a multinomial logistic regression with weekday/hour predictors.
-- Focus on interpretation (for example, odds ratios) rather than pure prediction accuracy.
-- Main objective: behavioral insight into submission and scheduling patterns.
-
-### Sampling Strategy Note
-- For large-scale modeling, use stratified random subsampling (for example, 5% to 10% within each workload category).
-- Check coefficient stability across multiple sampling proportions.
-- Use full data whenever feasible for descriptive summaries.
-
-### Current Repository Files
-- `dataset_suitability_report.md`: dataset suitability and selection report
-- `analysis_ready/peek_merged_data.py`: lightweight script to preview merged data headers and sample rows
-- `analysis_ready/merge_whole_cluster_usage.py`: streaming merge script for monthly txt files
-- `analysis_ready/merge_whole_cluster_usage.sh`: Mac/Linux launcher
-- `analysis_ready/merge_whole_cluster_usage.bat`: Windows launcher
-
-### How to Merge Monthly TXT Files (Reusable for Teammates)
-Recommended output format is compressed `txt.gz` to save space.
-
-Mac/Linux:
-```bash
-python3 analysis_ready/merge_whole_cluster_usage.py \
-  --input-dir /path/to/whole-cluster-usage \
-  --glob "*25.txt" \
-  --output /path/to/output/whole_cluster_usage_merged_raw.txt.gz \
-  --strict-header
+```text
+.
+├── README.md
+├── environment.yml
+├── requirements.txt
+├── analysis_ready/
+│   ├── merge_whole_cluster_usage.py
+│   ├── merge_whole_cluster_usage.sh
+│   ├── merge_whole_cluster_usage.bat
+│   └── peek_merged_data.py
+├── notebooks/
+│   ├── 01_build_master_2025.ipynb
+│   └── 02_job_submission_behavior_analysis.ipynb
+├── docs/
+│   ├── data_preprocessing_notes.pdf
+│   ├── analysis_workflow_notes.pdf
+│   ├── project_problem_statement.pdf
+│   ├── project_report_midterm.pdf
+│   ├── project_slides_midterm.pdf
+│   ├── project_report_final.pdf
+│   └── project_slides_final.pdf
+└── dataset_suitability_report.md
 ```
 
-or:
-```bash
-./analysis_ready/merge_whole_cluster_usage.sh \
-  --input-dir /path/to/whole-cluster-usage \
-  --glob "*25.txt" \
-  --output /path/to/output/whole_cluster_usage_merged_raw.txt.gz \
-  --strict-header
-```
+### What each part contains
 
-Windows (CMD):
-```bat
-analysis_ready\merge_whole_cluster_usage.bat ^
-  --input-dir "D:\path\to\whole-cluster-usage" ^
-  --glob "*25.txt" ^
-  --output "D:\path\to\output\whole_cluster_usage_merged_raw.txt.gz" ^
-  --strict-header
-```
+- `analysis_ready/`: scripts for merging and previewing monthly SLURM accounting files before notebook-based processing.
+- `notebooks/01_build_master_2025.ipynb`: preprocessing pipeline that validates schema, cleans records, engineers features, and builds local derived job-level outputs.
+- `notebooks/02_job_submission_behavior_analysis.ipynb`: main exploratory and modeling notebook covering wait-time behavior, submission timing, resource demand, GPU vs CPU comparisons, and workload-related queue analysis.
+- `outputs/`: local generated directory for derived analysis tables. It is intentionally ignored and not tracked in the public repository.
+- `docs/`: supporting project materials, including preprocessing notes, workflow notes, reports, and presentation slides.
+- `dataset_suitability_report.md`: supporting note on data source selection and dataset scope.
+
+## Reproducibility
+
+This repository is structured so the workflow can be re-run locally without publishing raw cluster data.
+
+1. Create the environment from `environment.yml` or `requirements.txt`.
+2. Prepare the merged raw SLURM accounting file locally using the scripts in `analysis_ready/`.
+3. Run `notebooks/01_build_master_2025.ipynb` to build the derived 2025 job-level tables locally under `outputs/`.
+4. Open `notebooks/02_job_submission_behavior_analysis.ipynb` to inspect exploratory results and queue-related modeling work.
+
+## Public / Private Data Boundary
+
+- Raw cluster data is not stored in this repository.
+- Monthly source logs, duplicate raw exports, and private local datasets remain excluded.
+- Only code, workflow notes, notebooks, and selected project documents are intended to be public here.
+- Derived job-level tables are generated locally and are not committed to the public repository.
+
+## Project Status
+
+Current repository status:
+
+- preprocessing pipeline is in place,
+- the preprocessing pipeline can generate derived 2025 job-level tables locally,
+- exploratory analysis notebook is available,
+- queue and workload modeling is exploratory and still evolving,
+- and repository presentation is being refined for clearer public documentation.
+
+## Scope Notes
+
+This repository is not presented as a finished scientific paper. It is a technically grounded project workspace for:
+
+- large-scale preprocessing,
+- feature engineering,
+- HPC scheduling behavior analysis,
+- GPU vs CPU workload comparison,
+- and queue / wait-time modeling.
+
+That framing is intentional: the project is strongest as an end-to-end reproducible analysis repo rather than as a polished final report.

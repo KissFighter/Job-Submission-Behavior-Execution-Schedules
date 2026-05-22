@@ -11,6 +11,7 @@ raw/
 slurm_all_jobs_*.csv
 *25.txt
 seff_*.txt
+*.csv.gz
 *.zip
 *.csv
 *.tsv
@@ -22,3 +23,6 @@ seff_*.txt
 *.hdf5
 *.sqlite
 *.db
+
+# Local derived tables and intermediate outputs
+outputs/
